@@ -1,0 +1,6 @@
+.idea
+venv
+my_start_script.sh
+example_page
+cron.txt
+*.pyc
