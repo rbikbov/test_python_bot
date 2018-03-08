@@ -17,7 +17,7 @@ dispatcher = updater.dispatcher
 my_utc = 5 # мой часовой пояс +5
 true_weekdays = [1, 2, 3, 4, 5] # понедельник, вторник, среда, четверг, пятница
 start = datetime.time(8) # начало работы биржи с учетом utc
-end = datetime.time(16) # завершение работы биржи с учетом utc
+end = datetime.time(10) # завершение работы биржи с учетом utc
 add_link = True # добавлять в сообщение ссылку на инструмент
 
 # интервал запросов
