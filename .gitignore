@@ -4,3 +4,5 @@ my_start_script.sh
 example_page
 cron.txt
 *.pyc
+html
+cache/*.json

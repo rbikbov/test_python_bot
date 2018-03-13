@@ -3,11 +3,14 @@ async-timeout==2.0.0
 beautifulsoup4==4.6.0
 certifi==2018.1.18
 chardet==3.0.4
+dryscrape==1.0
 future==0.16.0
 idna==2.6
 idna-ssl==1.0.1
+lxml==4.1.1
 multidict==4.1.0
 python-telegram-bot==10.0.1
-requests==2.18.4
 urllib3==1.22
+webkit-server==1.0
+xvfbwrapper==0.2.9
 yarl==1.1.1

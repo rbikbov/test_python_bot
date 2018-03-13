@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import random
+import json
 import re
+from datetime import date
 
-import requests
+import dryscrape
 from bs4 import BeautifulSoup
 
 
@@ -169,30 +170,35 @@ def generate_msg(data, old_data=None, new_trades=1):
         )
     return msg
 
+# сохранение итоговых данных в файл (на случай перезапуска скрипта):
+def data_to_cache(positions, total_stat):
+    positions_file = open('cache/positions_%s.json' % date.today(), 'w')
+    positions_file.write(json.dumps(positions))
+    positions_file.close()
+    total_stat_file = open('cache/total_stat_%s.json' % date.today(), 'w')
+    total_stat_file.write(json.dumps(total_stat))
+    total_stat_file.close()
+
 
 def run_bot(positions, total_stat, dispatcher, chat_id, add_link=True):
     # На некоторых сайтах стоит минимальная защита и они не отдают контент без user-agent
     # headers = {'user-agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'}
+    base_url = 'http://spimex.com/'
+    url = base_url + 'markets/oil_products/trades/'
     # чтобы избежать кэширования на любом уровне, на всякий случай добавим случайно число
-    url = 'http://spimex.com/markets/oil_products/trades/?r=' + str(random.random())
-    # url = 'http://spimex.com/markets/oil_products/trades/game/'
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    # url = base_url + 'markets/oil_products/trades/?r=' + str(random.random())
 
-    # # тестовая страничка
-    # r = open('./example_page/Ход торгов в Секции «Нефтепродукты».html')
-    # soup = BeautifulSoup(r, 'html.parser')
-
-    # # попытка получить html с выполненным js
-    # session = dryscrape.Session()
-    # session.visit(url)
-    # response = session.body()
-    # soup = BeautifulSoup(response, "lxml")
+    session = dryscrape.Session()
+    session.visit(url)
+    response = session.body()
+    soup = BeautifulSoup(response, "lxml")
 
 
     tds = soup.find_all('td', class_='td_name')
+    count = len(tds)
     search_pattern = re.compile(r"(конденсат газовый)|(газовый конденсат)", re.IGNORECASE)
-    print('%s инструментов по url ' % tds, url)
+
+    print('%s инструментов по url' % count, url)
 
     for td in tds:
         if not search_pattern.search(td.text):
@@ -206,7 +212,7 @@ def run_bot(positions, total_stat, dispatcher, chat_id, add_link=True):
         if id in positions: # если позиция не новая
             old_data = positions[id]
             new_trades = check_new_trades(data=data, old_data=old_data)
-            if new_trades > 0: # > 0 для тестов
+            if new_trades > 0:
                 positions[id] = data
                 msg = generate_msg(data=data, old_data=old_data, new_trades=new_trades)
                 add_trade_in_total_stat(data=data, old_data=old_data, new_trades=new_trades, total_stat=total_stat)
@@ -222,6 +228,7 @@ def run_bot(positions, total_stat, dispatcher, chat_id, add_link=True):
                 parse_mode = 'HTML'
                 disable_web_page_preview = True
                 a = tr.find('a', attrs={"title": "Информация об инструменте"})
+                a['href'] = base_url + a['href']
                 msg += '\r\n'
                 msg += str(a)
 
@@ -233,4 +240,6 @@ def run_bot(positions, total_stat, dispatcher, chat_id, add_link=True):
                 parse_mode=parse_mode,
                 disable_web_page_preview=disable_web_page_preview
             )
+
+    data_to_cache(positions, total_stat)
 
