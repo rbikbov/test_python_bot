@@ -5,6 +5,11 @@
 ## Build Setup
 
 ``` bash
+# install packages
+$ sudo apt-get install qt5-default libqt5webkit5-dev build-essential python-lxml python-pip xvfb
+
+then
+
 # start install script
 $ ./install_script.sh
 
@@ -17,7 +22,6 @@ $ python3 -m virtualenv venv
 $ source venv/bin/activate
 
 # install dependencies
-$ sudo apt-get install qt5-default libqt5webkit5-dev build-essential python-lxml python-pip xvfb
 $ pip install -r requirements.txt
 
 then
